@@ -14,6 +14,8 @@
 
 ## Why Dobby?
 
+The name stands for **D**ocument **O**bject **B**inder, **B**ut **Y**ours — a nod to what it replaces (`DocumentObjectBinder`) and a reminder that it's yours to extend. The Harry Potter reference is just a bonus.
+
 SolrJ's `DocumentObjectBinder` was written a long time ago, and it shows. It doesn't support records, `java.time`, enums, or `Optional`. It can't handle custom type conversions. It only allows one `child=true` field per class. It uses deprecated APIs internally and requires a no-arg constructor for everything.
 
 Dobby fixes all of that with a clean, Gson-inspired architecture: you configure a builder, it produces an immutable instance, and a chain of type adapters handles all conversions. It's extensible, composable, and thread-safe.
