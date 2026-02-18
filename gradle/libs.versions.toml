@@ -4,6 +4,7 @@ junit = "5.12.2"
 spotless = "7.0.4"
 maven-publish = "0.36.0"
 google-java-format = "1.27.0"
+testcontainers = "2.0.2"
 
 [libraries]
 solrj = { module = "org.apache.solr:solr-solrj", version.ref = "solrj" }
@@ -11,6 +12,9 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 # Versions managed by junit-bom
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+testcontainers-core = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
+testcontainers-solr = { module = "org.testcontainers:testcontainers-solr", version.ref = "testcontainers" }
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

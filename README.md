@@ -232,6 +232,16 @@ This compiles the library, runs tests, and checks code formatting. Java 21 is re
 ./gradlew test
 ```
 
+### Integration tests
+
+Integration tests use Testcontainers to run against a real Solr instance in Docker:
+
+```bash
+./gradlew integrationTest
+```
+
+These tests verify end-to-end document creation and retrieval. See `src/test/java/com/jamezrin/solrj/dobby/integration/` for details.
+
 ### Project structure
 
 ```
