@@ -1,0 +1,17 @@
+[versions]
+solrj = "9.10.1"
+junit = "5.12.2"
+spotless = "7.0.4"
+maven-publish = "0.36.0"
+google-java-format = "1.27.0"
+
+[libraries]
+solrj = { module = "org.apache.solr:solr-solrj", version.ref = "solrj" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+# Versions managed by junit-bom
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
