@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    id("com.diffplug.spotless") version "7.0.3"
 }
 
 group = "com.jamezrin"
@@ -27,4 +28,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        googleJavaFormat("1.26.0")
+        removeUnusedImports()
+        importOrder("java|javax", "org.apache", "", "com.jamezrin")
+    }
 }
