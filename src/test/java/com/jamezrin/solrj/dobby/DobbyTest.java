@@ -19,7 +19,7 @@ class DobbyTest {
 
     @Test
     void builderWithoutSolrJCompat() {
-        Dobby dobby = Dobby.builder().solrJCompat(false).build();
+        Dobby dobby = Dobby.builder().enableSolrJCompat(false).build();
         assertNotNull(dobby);
     }
 

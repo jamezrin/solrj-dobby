@@ -132,7 +132,7 @@ public class LegacyBean {
 }
 ```
 
-To disable this, call `.solrJCompat(false)` on the builder.
+To disable this, call `.enableSolrJCompat(false)` on the builder.
 
 ## Custom type adapters
 

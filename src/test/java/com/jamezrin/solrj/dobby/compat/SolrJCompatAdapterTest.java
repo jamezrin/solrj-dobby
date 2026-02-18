@@ -132,7 +132,7 @@ class SolrJCompatAdapterTest {
     class DisabledCompatTests {
         @Test
         void solrJAnnotationIgnoredWhenDisabled() {
-            Dobby noCompat = Dobby.builder().solrJCompat(false).build();
+            Dobby noCompat = Dobby.builder().enableSolrJCompat(false).build();
             assertThrows(Exception.class, () -> noCompat.fromDoc(new SolrDocument(), SolrJBean.class));
         }
     }

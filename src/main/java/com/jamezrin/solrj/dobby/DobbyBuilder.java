@@ -30,7 +30,7 @@ public final class DobbyBuilder {
 
     private final List<TypeAdapterFactory> userFactories = new ArrayList<>();
     private FieldNamingStrategy fieldNamingStrategy = FieldNamingStrategy.IDENTITY;
-    private boolean solrJCompat = true;
+    private boolean enableSolrJCompat = true;
 
     DobbyBuilder() {
     }
@@ -95,8 +95,8 @@ public final class DobbyBuilder {
      * @param enabled {@code true} to enable, {@code false} to disable
      * @return this builder
      */
-    public DobbyBuilder solrJCompat(boolean enabled) {
-        this.solrJCompat = enabled;
+    public DobbyBuilder enableSolrJCompat(boolean enabled) {
+        this.enableSolrJCompat = enabled;
         return this;
     }
 
@@ -124,7 +124,7 @@ public final class DobbyBuilder {
         factories.add(new ReflectiveAdapterFactory());
 
         // 4. SolrJ @Field compat (lowest priority among reflective)
-        if (solrJCompat) {
+        if (enableSolrJCompat) {
             factories.add(new SolrJCompatAdapterFactory());
         }
 
