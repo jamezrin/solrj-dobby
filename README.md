@@ -14,7 +14,7 @@
 
 ## Why Dobby?
 
-The name stands for **D**ocument **O**bject **B**inder, **B**ut **Y**ours — a nod to what it replaces (`DocumentObjectBinder`) and a reminder that it's yours to extend. The Harry Potter reference is just a bonus.
+The name stands for **D**ocument **O**bject **B**inder, **B**ut **Y**ours - a nod to what it replaces (`DocumentObjectBinder`) and a reminder that it's yours to extend. The Harry Potter reference is just a bonus.
 
 SolrJ's `DocumentObjectBinder` was written a long time ago, and it shows. It doesn't support records, `java.time`, enums, or `Optional`. It can't handle custom type conversions. It only allows one `child=true` field per class. It uses deprecated APIs internally and requires a no-arg constructor for everything.
 
@@ -57,6 +57,11 @@ Product product = new Product("p1", "Widget", 19.99);
 
 SolrInputDocument doc = dobby.toDoc(product);
 solrClient.add("products", doc);
+
+// Or convert multiple objects at once
+List<Product> products = List.of(product1, product2, product3);
+List<SolrInputDocument> docs = dobby.toDocs(products);
+solrClient.add("products", docs);
 ```
 
 ## Annotating your classes
@@ -213,7 +218,9 @@ cd solrj-dobby
 ./gradlew build
 ```
 
-This compiles the library and runs the full test suite. Java 21 is required - the Gradle toolchain will auto-download it if your `JAVA_HOME` doesn't match.
+This compiles the library, runs tests, and checks code formatting. Java 21 is required - the Gradle toolchain will auto-download it if your `JAVA_HOME` doesn't match.
+
+**Code formatting:** This project uses Spotless with Google Java Format. Run `./gradlew spotlessApply` to format your code before committing. The build will fail if code is not properly formatted.
 
 ### Running tests
 
