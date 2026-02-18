@@ -134,6 +134,29 @@ public class LegacyBean {
 
 To disable this, call `.enableSolrJCompat(false)` on the builder.
 
+## Drop-in replacement for DocumentObjectBinder
+
+If you have existing code that uses SolrJ's `DocumentObjectBinder`, you can swap it for `DobbyDocumentObjectBinder` without changing any other code:
+
+```java
+// Before:
+DocumentObjectBinder binder = new DocumentObjectBinder();
+
+// After (drop-in replacement):
+DocumentObjectBinder binder = new DobbyDocumentObjectBinder();
+```
+
+This gives you Dobby's enhanced capabilities (records, java.time, enums, custom adapters) while maintaining full compatibility with the existing `DocumentObjectBinder` API.
+
+For more control over the Dobby configuration:
+
+```java
+Dobby dobby = Dobby.builder()
+    .registerAdapter(Money.class, new MoneyAdapter())
+    .build();
+DocumentObjectBinder binder = new DobbyDocumentObjectBinder(dobby);
+```
+
 ## Custom type adapters
 
 Register your own adapters for types Dobby doesn't handle natively:
@@ -176,7 +199,7 @@ Built-in strategies: `IDENTITY` (default), `LOWER_UNDERSCORE`, `LOWER_CASE`. Or 
 ## Requirements
 
 - Java 21+
-- SolrJ 9.8.0 (included transitively)
+- SolrJ 9.10.1 (included transitively)
 
 ## Contributing
 
@@ -221,7 +244,8 @@ src/main/java/com/jamezrin/solrj/dobby/
 │   ├── OptionalAdapterFactory.java
 │   └── ReflectiveAdapterFactory.java
 └── compat/
-    └── SolrJCompatAdapterFactory.java
+    ├── SolrJCompatAdapterFactory.java
+    └── DobbyDocumentObjectBinder.java
 ```
 
 ### Guidelines
