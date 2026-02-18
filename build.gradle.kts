@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     // SolrJ as an API dependency so it's transitively exposed to consumers
-    api("org.apache.solr:solr-solrj:9.8.0")
+    api("org.apache.solr:solr-solrj:9.10.1")
 
     // Test dependencies
     testImplementation(platform("org.junit:junit-bom:5.11.4"))
