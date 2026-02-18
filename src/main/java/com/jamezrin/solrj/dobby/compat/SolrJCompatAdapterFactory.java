@@ -3,6 +3,7 @@ package com.jamezrin.solrj.dobby.compat;
 import com.jamezrin.solrj.dobby.BeanProperties;
 import com.jamezrin.solrj.dobby.Dobby;
 import com.jamezrin.solrj.dobby.DobbyException;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.FieldNamingStrategy;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
@@ -62,7 +63,6 @@ public final class SolrJCompatAdapterFactory implements TypeAdapterFactory {
         return createPojoAdapter(raw, fields);
     }
 
-    @SuppressWarnings("unchecked")
     private <T> TypeAdapter<T> createPojoAdapter(Class<? super T> raw, List<CompatBoundField> fields) {
         Constructor<?> constructor;
         try {
@@ -83,7 +83,7 @@ public final class SolrJCompatAdapterFactory implements TypeAdapterFactory {
                 }
 
                 try {
-                    T obj = (T) constructor.newInstance();
+                    T obj = DobbyUtils.uncheckedCast(constructor.newInstance());
                     for (CompatBoundField bf : fields) {
                         Object val = readValue(bf, doc);
                         if (val != null || !bf.type.isPrimitive()) {
@@ -111,7 +111,6 @@ public final class SolrJCompatAdapterFactory implements TypeAdapterFactory {
         };
     }
 
-    @SuppressWarnings("unchecked")
     private <T> TypeAdapter<T> createRecordAdapter(Class<? super T> raw, List<CompatBoundField> fields) {
         RecordComponent[] components = raw.getRecordComponents();
         Constructor<?> canonicalCtor;
@@ -154,7 +153,7 @@ public final class SolrJCompatAdapterFactory implements TypeAdapterFactory {
                     }
                 }
                 try {
-                    return (T) canonicalCtor.newInstance(args);
+                    return DobbyUtils.uncheckedCast(canonicalCtor.newInstance(args));
                 } catch (Exception e) {
                     throw new DobbyException("Failed to create record " + raw.getName(), e);
                 }
@@ -193,13 +192,13 @@ public final class SolrJCompatAdapterFactory implements TypeAdapterFactory {
         return bf.adapter.read(raw);
     }
 
-    @SuppressWarnings("unchecked")
     private static SolrInputDocument writeDoc(List<CompatBoundField> fields, Object value) {
         SolrInputDocument doc = new SolrInputDocument();
         for (CompatBoundField bf : fields) {
             Object fv = bf.get(value);
             if (fv == null) continue;
-            Object sv = ((TypeAdapter<Object>) bf.adapter).write(fv);
+            TypeAdapter<Object> adapter = DobbyUtils.uncheckedCast(bf.adapter);
+            Object sv = adapter.write(fv);
             if (sv == null) continue;
 
             if (bf.child) {

@@ -157,6 +157,34 @@ class DobbyTest {
         assertEquals("hello", safe.read("hello"));
     }
 
+    @Test
+    void toDocsConvertsMultipleObjects() {
+        Dobby dobby = Dobby.builder().build();
+
+        SimpleBean bean1 = new SimpleBean();
+        bean1.id = "1";
+        bean1.name = "A";
+
+        SimpleBean bean2 = new SimpleBean();
+        bean2.id = "2";
+        bean2.name = "B";
+
+        List<SolrInputDocument> docs = dobby.toDocs(List.of(bean1, bean2));
+        assertEquals(2, docs.size());
+        assertEquals("1", docs.get(0).getFieldValue("id"));
+        assertEquals("A", docs.get(0).getFieldValue("name"));
+        assertEquals("2", docs.get(1).getFieldValue("id"));
+        assertEquals("B", docs.get(1).getFieldValue("name"));
+    }
+
+    @Test
+    void toDocsReturnsEmptyListForEmptyInput() {
+        Dobby dobby = Dobby.builder().build();
+        List<SolrInputDocument> docs = dobby.toDocs(List.of());
+        assertNotNull(docs);
+        assertTrue(docs.isEmpty());
+    }
+
     public static class SimpleBean {
         @SolrField("id")
         public String id;

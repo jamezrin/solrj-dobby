@@ -29,20 +29,18 @@ public class TypeToken<T> {
      * <p>Clients should create an anonymous subclass:
      * {@code new TypeToken<List<String>>() {}}
      */
-    @SuppressWarnings("unchecked")
     protected TypeToken() {
         this.type = getSuperclassTypeParameter(getClass());
-        this.rawType = (Class<? super T>) getRawType(this.type);
+        this.rawType = DobbyUtils.uncheckedCast(getRawType(this.type));
         this.hashCode = this.type.hashCode();
     }
 
     /**
      * Creates a type token for the given {@code Class}.
      */
-    @SuppressWarnings("unchecked")
     private TypeToken(Type type) {
         this.type = canonicalize(type);
-        this.rawType = (Class<? super T>) getRawType(this.type);
+        this.rawType = DobbyUtils.uncheckedCast(getRawType(this.type));
         this.hashCode = this.type.hashCode();
     }
 

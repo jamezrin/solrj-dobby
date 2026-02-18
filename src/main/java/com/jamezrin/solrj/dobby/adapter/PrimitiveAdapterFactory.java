@@ -2,6 +2,7 @@ package com.jamezrin.solrj.dobby.adapter;
 
 import com.jamezrin.solrj.dobby.Dobby;
 import com.jamezrin.solrj.dobby.DobbyException;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
 import com.jamezrin.solrj.dobby.TypeToken;
@@ -34,13 +35,12 @@ public final class PrimitiveAdapterFactory implements TypeAdapterFactory {
     );
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
         Class<?> raw = type.getRawType();
         if (!SUPPORTED.contains(raw)) {
             return null;
         }
-        return (TypeAdapter<T>) createAdapter(raw);
+        return DobbyUtils.uncheckedCast(createAdapter(raw));
     }
 
     private TypeAdapter<?> createAdapter(Class<?> raw) {

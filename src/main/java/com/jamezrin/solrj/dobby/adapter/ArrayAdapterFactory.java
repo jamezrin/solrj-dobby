@@ -1,6 +1,7 @@
 package com.jamezrin.solrj.dobby.adapter;
 
 import com.jamezrin.solrj.dobby.Dobby;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
 import com.jamezrin.solrj.dobby.TypeToken;
@@ -22,7 +23,6 @@ import java.util.List;
 public final class ArrayAdapterFactory implements TypeAdapterFactory {
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
         Class<?> raw = type.getRawType();
         if (!raw.isArray() || raw == byte[].class) {
@@ -33,7 +33,7 @@ public final class ArrayAdapterFactory implements TypeAdapterFactory {
         Class<?> componentClass = TypeToken.getRawType(componentType);
         TypeAdapter<?> componentAdapter = dobby.getAdapter(TypeToken.of(componentType));
 
-        return (TypeAdapter<T>) new ArrayAdapter<>(componentAdapter, componentClass);
+        return DobbyUtils.uncheckedCast(new ArrayAdapter<>(componentAdapter, componentClass));
     }
 
     private static Type getComponentType(TypeToken<?> type) {
@@ -48,9 +48,8 @@ public final class ArrayAdapterFactory implements TypeAdapterFactory {
         private final TypeAdapter<E> componentAdapter;
         private final Class<?> componentClass;
 
-        @SuppressWarnings("unchecked")
         ArrayAdapter(TypeAdapter<?> componentAdapter, Class<?> componentClass) {
-            this.componentAdapter = (TypeAdapter<E>) componentAdapter;
+            this.componentAdapter = DobbyUtils.uncheckedCast(componentAdapter);
             this.componentClass = componentClass;
         }
 
@@ -86,8 +85,7 @@ public final class ArrayAdapterFactory implements TypeAdapterFactory {
             int len = Array.getLength(value);
             List<Object> result = new ArrayList<>(len);
             for (int i = 0; i < len; i++) {
-                @SuppressWarnings("unchecked")
-                E element = (E) Array.get(value, i);
+                E element = DobbyUtils.uncheckedCast(Array.get(value, i));
                 result.add(componentAdapter.write(element));
             }
             return result;

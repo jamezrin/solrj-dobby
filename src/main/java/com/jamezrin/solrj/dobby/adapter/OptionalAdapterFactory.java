@@ -1,6 +1,7 @@
 package com.jamezrin.solrj.dobby.adapter;
 
 import com.jamezrin.solrj.dobby.Dobby;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
 import com.jamezrin.solrj.dobby.TypeToken;
@@ -21,7 +22,6 @@ import java.util.Optional;
 public final class OptionalAdapterFactory implements TypeAdapterFactory {
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
         if (type.getRawType() != Optional.class) {
             return null;
@@ -29,7 +29,7 @@ public final class OptionalAdapterFactory implements TypeAdapterFactory {
 
         Type innerType = getOptionalInnerType(type);
         TypeAdapter<?> innerAdapter = dobby.getAdapter(TypeToken.of(innerType));
-        return (TypeAdapter<T>) new OptionalAdapter<>(innerAdapter);
+        return DobbyUtils.uncheckedCast(new OptionalAdapter<>(innerAdapter));
     }
 
     private static Type getOptionalInnerType(TypeToken<?> type) {
@@ -46,9 +46,8 @@ public final class OptionalAdapterFactory implements TypeAdapterFactory {
     private static final class OptionalAdapter<E> extends TypeAdapter<Optional<E>> {
         private final TypeAdapter<E> innerAdapter;
 
-        @SuppressWarnings("unchecked")
         OptionalAdapter(TypeAdapter<?> innerAdapter) {
-            this.innerAdapter = (TypeAdapter<E>) innerAdapter;
+            this.innerAdapter = DobbyUtils.uncheckedCast(innerAdapter);
         }
 
         @Override

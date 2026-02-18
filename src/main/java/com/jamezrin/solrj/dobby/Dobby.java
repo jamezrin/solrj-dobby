@@ -87,21 +87,62 @@ public final class Dobby {
      * Converts a Java object to a {@link SolrInputDocument}.
      *
      * @param obj the Java object to convert
+     * @param <T> the Java type
      * @return the Solr input document
      * @throws DobbyException if conversion fails
      */
-    public SolrInputDocument toDoc(Object obj) {
+    public <T> SolrInputDocument toDoc(T obj) {
         Objects.requireNonNull(obj, "obj");
-        @SuppressWarnings("unchecked")
-        TypeAdapter<Object> adapter = (TypeAdapter<Object>) getAdapter(TypeToken.of(obj.getClass()));
+        Class<T> type = DobbyUtils.uncheckedCast(obj.getClass());
+        TypeAdapter<T> adapter = getAdapter(type);
         Object result = adapter.write(obj);
         if (result instanceof SolrInputDocument sid) {
             return sid;
         }
         throw new DobbyException(
-                "TypeAdapter for " + obj.getClass().getName()
+                "TypeAdapter for " + type.getName()
                         + " did not produce a SolrInputDocument (got " + (result == null ? "null" : result.getClass().getName()) + ")."
                         + " Only bean/record types can be converted to SolrInputDocument.");
+    }
+
+    /**
+     * Converts a collection of Java objects to a list of {@link SolrInputDocument}s.
+     * All objects must be of the same type.
+     *
+     * @param objects the Java objects to convert
+     * @param <T> the Java type
+     * @return the Solr input documents
+     * @throws DobbyException if conversion fails
+     */
+    public <T> List<SolrInputDocument> toDocs(Collection<T> objects) {
+        Objects.requireNonNull(objects, "objects");
+        if (objects.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Class<T> type = DobbyUtils.getElementType(objects);
+        if (type == null) {
+            // All elements are null
+            return new ArrayList<>();
+        }
+
+        TypeAdapter<T> adapter = getAdapter(type);
+        List<SolrInputDocument> result = new ArrayList<>(objects.size());
+        for (T obj : objects) {
+            if (obj == null) {
+                continue;
+            }
+            Object solrObj = adapter.write(obj);
+            if (solrObj instanceof SolrInputDocument sid) {
+                result.add(sid);
+            } else {
+                throw new DobbyException(
+                        "TypeAdapter for " + type.getName()
+                                + " did not produce a SolrInputDocument (got " + (solrObj == null ? "null" : solrObj.getClass().getName()) + ")."
+                                + " Only bean/record types can be converted to SolrInputDocument.");
+            }
+        }
+        return result;
     }
 
     /**
@@ -124,13 +165,12 @@ public final class Dobby {
      * @return the adapter
      * @throws DobbyException if no adapter is found
      */
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> getAdapter(TypeToken<T> type) {
         Objects.requireNonNull(type, "type");
 
         TypeAdapter<?> cached = adapterCache.get(type);
         if (cached != null) {
-            return (TypeAdapter<T>) cached;
+            return DobbyUtils.uncheckedCast(cached);
         }
 
         // To handle recursive types, we use a FutureTypeAdapter that will be resolved later.

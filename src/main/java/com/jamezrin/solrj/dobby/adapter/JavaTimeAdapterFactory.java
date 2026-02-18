@@ -2,6 +2,7 @@ package com.jamezrin.solrj.dobby.adapter;
 
 import com.jamezrin.solrj.dobby.Dobby;
 import com.jamezrin.solrj.dobby.DobbyException;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
 import com.jamezrin.solrj.dobby.TypeToken;
@@ -23,14 +24,13 @@ import java.util.Date;
 public final class JavaTimeAdapterFactory implements TypeAdapterFactory {
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
         Class<?> raw = type.getRawType();
-        if (raw == Instant.class) return (TypeAdapter<T>) INSTANT_ADAPTER;
-        if (raw == LocalDate.class) return (TypeAdapter<T>) LOCAL_DATE_ADAPTER;
-        if (raw == LocalDateTime.class) return (TypeAdapter<T>) LOCAL_DATE_TIME_ADAPTER;
-        if (raw == ZonedDateTime.class) return (TypeAdapter<T>) ZONED_DATE_TIME_ADAPTER;
-        if (raw == Date.class) return (TypeAdapter<T>) DATE_ADAPTER;
+        if (raw == Instant.class) return DobbyUtils.uncheckedCast(INSTANT_ADAPTER);
+        if (raw == LocalDate.class) return DobbyUtils.uncheckedCast(LOCAL_DATE_ADAPTER);
+        if (raw == LocalDateTime.class) return DobbyUtils.uncheckedCast(LOCAL_DATE_TIME_ADAPTER);
+        if (raw == ZonedDateTime.class) return DobbyUtils.uncheckedCast(ZONED_DATE_TIME_ADAPTER);
+        if (raw == Date.class) return DobbyUtils.uncheckedCast(DATE_ADAPTER);
         return null;
     }
 

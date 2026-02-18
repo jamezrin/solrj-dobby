@@ -3,6 +3,7 @@ package com.jamezrin.solrj.dobby.adapter;
 import com.jamezrin.solrj.dobby.BeanProperties;
 import com.jamezrin.solrj.dobby.Dobby;
 import com.jamezrin.solrj.dobby.DobbyException;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.FieldNamingStrategy;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
@@ -63,7 +64,6 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
         return createPojoAdapter(dobby, raw, boundFields);
     }
 
-    @SuppressWarnings("unchecked")
     private <T> TypeAdapter<T> createPojoAdapter(Dobby dobby, Class<? super T> raw, List<BoundField> boundFields) {
         Constructor<?> constructor;
         try {
@@ -85,7 +85,7 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
                 }
 
                 try {
-                    T obj = (T) constructor.newInstance();
+                    T obj = DobbyUtils.uncheckedCast(constructor.newInstance());
                     for (BoundField bf : boundFields) {
                         Object fieldValue = readFieldValue(bf, doc);
                         if (fieldValue != null || !bf.type().isPrimitive()) {
@@ -113,7 +113,6 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
         };
     }
 
-    @SuppressWarnings("unchecked")
     private <T> TypeAdapter<T> createRecordAdapter(Dobby dobby, Class<? super T> raw, List<BoundField> boundFields) {
         RecordComponent[] components = raw.getRecordComponents();
         Constructor<?> canonicalConstructor;
@@ -160,7 +159,7 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
                 }
 
                 try {
-                    return (T) canonicalConstructor.newInstance(args);
+                    return DobbyUtils.uncheckedCast(canonicalConstructor.newInstance(args));
                 } catch (Exception e) {
                     throw new DobbyException("Failed to create record " + raw.getName(), e);
                 }
@@ -217,14 +216,14 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private static SolrInputDocument writeToDoc(List<BoundField> boundFields, Object value) {
         SolrInputDocument doc = new SolrInputDocument();
         for (BoundField bf : boundFields) {
             Object fieldValue = bf.get(value);
             if (fieldValue == null) continue;
 
-            Object solrValue = ((TypeAdapter<Object>) bf.adapter()).write(fieldValue);
+            TypeAdapter<Object> adapter = DobbyUtils.uncheckedCast(bf.adapter());
+            Object solrValue = adapter.write(fieldValue);
             if (solrValue == null) continue;
 
             if (bf.nested()) {

@@ -137,14 +137,13 @@ public final class DobbyBuilder {
     private static TypeAdapterFactory singleTypeFactory(TypeToken<?> typeToken, TypeAdapter<?> adapter) {
         return new TypeAdapterFactory() {
             @Override
-            @SuppressWarnings("unchecked")
             public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
                 if (type.equals(typeToken)) {
-                    return (TypeAdapter<T>) adapter;
+                    return DobbyUtils.uncheckedCast(adapter);
                 }
                 // Also match raw class for convenience (e.g., registering for Integer.class should match int)
                 if (type.getRawType() == typeToken.getRawType() && typeToken.getType() instanceof Class) {
-                    return (TypeAdapter<T>) adapter;
+                    return DobbyUtils.uncheckedCast(adapter);
                 }
                 return null;
             }

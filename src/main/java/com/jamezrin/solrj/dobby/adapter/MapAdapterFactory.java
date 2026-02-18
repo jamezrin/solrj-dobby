@@ -2,6 +2,7 @@ package com.jamezrin.solrj.dobby.adapter;
 
 import com.jamezrin.solrj.dobby.Dobby;
 import com.jamezrin.solrj.dobby.DobbyException;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
 import com.jamezrin.solrj.dobby.TypeToken;
@@ -23,7 +24,6 @@ import java.util.Map;
 public final class MapAdapterFactory implements TypeAdapterFactory {
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
         Class<?> raw = type.getRawType();
         if (!Map.class.isAssignableFrom(raw)) {
@@ -41,7 +41,7 @@ public final class MapAdapterFactory implements TypeAdapterFactory {
         }
 
         TypeAdapter<?> valueAdapter = dobby.getAdapter(TypeToken.of(valueType));
-        return (TypeAdapter<T>) new MapAdapter<>(valueAdapter);
+        return DobbyUtils.uncheckedCast(new MapAdapter<>(valueAdapter));
     }
 
     private static Type[] getMapKeyValueTypes(TypeToken<?> type) {
@@ -58,20 +58,19 @@ public final class MapAdapterFactory implements TypeAdapterFactory {
     private static final class MapAdapter<V> extends TypeAdapter<Map<String, V>> {
         private final TypeAdapter<V> valueAdapter;
 
-        @SuppressWarnings("unchecked")
         MapAdapter(TypeAdapter<?> valueAdapter) {
-            this.valueAdapter = (TypeAdapter<V>) valueAdapter;
+            this.valueAdapter = DobbyUtils.uncheckedCast(valueAdapter);
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public Map<String, V> read(Object solrValue) {
             if (solrValue == null) return null;
             if (solrValue instanceof Map<?, ?> map) {
                 Map<String, V> result = new LinkedHashMap<>(map.size());
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
                     String key = entry.getKey().toString();
-                    result.put(key, valueAdapter.read(entry.getValue()));
+                    V value = valueAdapter.read(entry.getValue());
+                    result.put(key, value);
                 }
                 return result;
             }

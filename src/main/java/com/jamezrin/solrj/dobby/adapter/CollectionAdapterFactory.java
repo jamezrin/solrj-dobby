@@ -2,6 +2,7 @@ package com.jamezrin.solrj.dobby.adapter;
 
 import com.jamezrin.solrj.dobby.Dobby;
 import com.jamezrin.solrj.dobby.DobbyException;
+import com.jamezrin.solrj.dobby.DobbyUtils;
 import com.jamezrin.solrj.dobby.TypeAdapter;
 import com.jamezrin.solrj.dobby.TypeAdapterFactory;
 import com.jamezrin.solrj.dobby.TypeToken;
@@ -27,7 +28,6 @@ import java.util.Set;
 public final class CollectionAdapterFactory implements TypeAdapterFactory {
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> TypeAdapter<T> create(Dobby dobby, TypeToken<T> type) {
         Class<?> raw = type.getRawType();
         if (!Collection.class.isAssignableFrom(raw)) {
@@ -38,10 +38,10 @@ public final class CollectionAdapterFactory implements TypeAdapterFactory {
         TypeAdapter<?> elementAdapter = dobby.getAdapter(TypeToken.of(elementType));
 
         if (List.class.isAssignableFrom(raw) || Collection.class == raw) {
-            return (TypeAdapter<T>) new ListAdapter<>(elementAdapter);
+            return DobbyUtils.uncheckedCast(new ListAdapter<>(elementAdapter));
         }
         if (Set.class.isAssignableFrom(raw)) {
-            return (TypeAdapter<T>) new SetAdapter<>(elementAdapter);
+            return DobbyUtils.uncheckedCast(new SetAdapter<>(elementAdapter));
         }
 
         return null;
@@ -62,13 +62,11 @@ public final class CollectionAdapterFactory implements TypeAdapterFactory {
     private static final class ListAdapter<E> extends TypeAdapter<List<E>> {
         private final TypeAdapter<E> elementAdapter;
 
-        @SuppressWarnings("unchecked")
         ListAdapter(TypeAdapter<?> elementAdapter) {
-            this.elementAdapter = (TypeAdapter<E>) elementAdapter;
+            this.elementAdapter = DobbyUtils.uncheckedCast(elementAdapter);
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public List<E> read(Object solrValue) {
             if (solrValue == null) return null;
             if (solrValue instanceof Collection<?> coll) {
@@ -103,13 +101,11 @@ public final class CollectionAdapterFactory implements TypeAdapterFactory {
     private static final class SetAdapter<E> extends TypeAdapter<Set<E>> {
         private final TypeAdapter<E> elementAdapter;
 
-        @SuppressWarnings("unchecked")
         SetAdapter(TypeAdapter<?> elementAdapter) {
-            this.elementAdapter = (TypeAdapter<E>) elementAdapter;
+            this.elementAdapter = DobbyUtils.uncheckedCast(elementAdapter);
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public Set<E> read(Object solrValue) {
             if (solrValue == null) return null;
             if (solrValue instanceof Collection<?> coll) {
