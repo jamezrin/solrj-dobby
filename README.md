@@ -8,6 +8,10 @@
   A modern, extensible replacement for SolrJ's `DocumentObjectBinder`.<br/>
   Java 21 &bull; Records &bull; java.time &bull; Enums &bull; Nested docs &bull; Custom adapters
 
+  [![CI](https://github.com/jamezrin/solrj-dobby/actions/workflows/ci.yml/badge.svg)](https://github.com/jamezrin/solrj-dobby/actions/workflows/ci.yml)
+  [![Maven Central](https://img.shields.io/maven-central/v/com.jamezrin/solrj-dobby)](https://central.sonatype.com/artifact/com.jamezrin/solrj-dobby)
+  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 </div>
 
 ---
