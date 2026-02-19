@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.jamezrin"
-version = "1.0.0"
+version = "1.0.1"
 
 base {
     archivesName = "solrj-dobby"
