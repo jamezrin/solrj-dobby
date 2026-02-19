@@ -2,6 +2,7 @@ package com.jamezrin.solrj.dobby;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
@@ -185,6 +186,45 @@ class DobbyTest {
     assertTrue(docs.isEmpty());
   }
 
+  @Test
+  void selfReferencingTypeResolvesAdapter() {
+    Dobby dobby = Dobby.builder().build();
+
+    // Getting an adapter for a self-referencing type should not cause infinite recursion
+    TypeAdapter<TreeNode> adapter = dobby.getAdapter(TreeNode.class);
+    assertNotNull(adapter);
+
+    // Verify it works: create a parent with a nested child
+    SolrDocument childDoc = new SolrDocument();
+    childDoc.setField("name", "child");
+
+    SolrDocument parentDoc = new SolrDocument();
+    parentDoc.setField("name", "parent");
+    parentDoc.addChildDocument(childDoc);
+
+    TreeNode parent = dobby.fromDoc(parentDoc, TreeNode.class);
+    assertEquals("parent", parent.name);
+    assertNotNull(parent.child);
+    assertEquals("child", parent.child.name);
+  }
+
+  @Test
+  void byteBufferReadDoesNotMutateSource() {
+    Dobby dobby = Dobby.builder().build();
+    TypeAdapter<byte[]> adapter = dobby.getAdapter(byte[].class);
+
+    byte[] data = {1, 2, 3, 4};
+    ByteBuffer buffer = ByteBuffer.wrap(data);
+
+    // Read once
+    byte[] first = adapter.read(buffer);
+    assertArrayEquals(data, first);
+
+    // Buffer position should be unchanged, so a second read produces the same result
+    byte[] second = adapter.read(buffer);
+    assertArrayEquals(data, second);
+  }
+
   public static class SimpleBean {
     @SolrField("id")
     public String id;
@@ -200,5 +240,13 @@ class DobbyTest {
   public static class NamingBean {
     @SolrField // no explicit name - naming strategy applies
     public String myField;
+  }
+
+  public static class TreeNode {
+    @SolrField("name")
+    public String name;
+
+    @SolrField(nested = true)
+    public TreeNode child;
   }
 }
