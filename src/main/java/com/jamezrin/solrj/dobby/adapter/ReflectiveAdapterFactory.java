@@ -166,7 +166,7 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
         // Fill defaults for primitives
         for (int i = 0; i < components.length; i++) {
           if (args[i] == null && components[i].getType().isPrimitive()) {
-            args[i] = defaultValue(components[i].getType());
+            args[i] = DobbyUtils.defaultPrimitiveValue(components[i].getType());
           }
         }
 
@@ -399,18 +399,6 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
       return ann.value();
     }
     return strategy.translateName(javaName);
-  }
-
-  private static Object defaultValue(Class<?> type) {
-    if (type == boolean.class) return false;
-    if (type == byte.class) return (byte) 0;
-    if (type == short.class) return (short) 0;
-    if (type == int.class) return 0;
-    if (type == long.class) return 0L;
-    if (type == float.class) return 0.0f;
-    if (type == double.class) return 0.0d;
-    if (type == char.class) return '\0';
-    return null;
   }
 
   /** Represents a single bound field with all the metadata needed for reading/writing. */

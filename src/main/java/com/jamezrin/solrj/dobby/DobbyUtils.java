@@ -30,6 +30,26 @@ public final class DobbyUtils {
   }
 
   /**
+   * Returns the default value for a primitive type.
+   *
+   * <p>Used when constructing records where a component has no corresponding Solr field value.
+   *
+   * @param type the primitive class
+   * @return the default value (0, false, etc.), or null for non-primitive types
+   */
+  public static Object defaultPrimitiveValue(Class<?> type) {
+    if (type == boolean.class) return false;
+    if (type == byte.class) return (byte) 0;
+    if (type == short.class) return (short) 0;
+    if (type == int.class) return 0;
+    if (type == long.class) return 0L;
+    if (type == float.class) return 0.0f;
+    if (type == double.class) return 0.0d;
+    if (type == char.class) return '\0';
+    return null;
+  }
+
+  /**
    * Returns the class of the first non-null element in a collection.
    *
    * @param objects the collection to inspect
