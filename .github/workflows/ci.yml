@@ -26,9 +26,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+          cache: gradle
 
       - name: Build and test
         run: ./gradlew build
@@ -86,6 +84,9 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: gradle
 
       - name: Submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/gradle-build-action@v2.12.0
+        with:
+          dependency-graph: generate-and-submit
