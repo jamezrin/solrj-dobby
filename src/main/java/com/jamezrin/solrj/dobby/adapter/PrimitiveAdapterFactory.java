@@ -267,8 +267,9 @@ public final class PrimitiveAdapterFactory implements TypeAdapterFactory {
           if (solrValue == null) return null;
           if (solrValue instanceof byte[] b) return b;
           if (solrValue instanceof ByteBuffer bb) {
-            byte[] arr = new byte[bb.remaining()];
-            bb.get(arr);
+            ByteBuffer slice = bb.duplicate();
+            byte[] arr = new byte[slice.remaining()];
+            slice.get(arr);
             return arr;
           }
           throw new DobbyException(
