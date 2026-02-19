@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew integrationTest
 
       - name: Upload test results
-        if: always()
+        if: always() && !env.ACT
         uses: actions/upload-artifact@v4
         with:
           name: test-results-jdk-${{ matrix.java-version }}
@@ -43,7 +43,7 @@ jobs:
           retention-days: 14
 
       - name: Upload integration test results
-        if: always()
+        if: always() && !env.ACT
         uses: actions/upload-artifact@v4
         with:
           name: integration-test-results-jdk-${{ matrix.java-version }}
@@ -51,7 +51,7 @@ jobs:
           retention-days: 14
 
       - name: Upload coverage report
-        if: always() && matrix.java-version == '21'
+        if: always() && matrix.java-version == '21' && !env.ACT
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
