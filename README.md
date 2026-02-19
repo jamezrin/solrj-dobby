@@ -16,6 +16,20 @@
 
 ---
 
+## Installation
+
+Add the dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.jamezrin</groupId>
+    <artifactId>solrj-dobby</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
+
+For Gradle, Kotlin DSL, and other build tools, see the snippets on [Maven Central](https://central.sonatype.com/artifact/com.jamezrin/solrj-dobby).
+
 ## Why Dobby?
 
 The name stands for **D**ocument **O**bject **B**inder, **B**ut **Y**ours - a nod to what it replaces (`DocumentObjectBinder`) and a reminder that it's yours to extend. The Harry Potter reference is just a bonus.
