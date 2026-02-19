@@ -219,7 +219,7 @@ public final class Dobby {
    * references during adapter creation.
    */
   private static final class FutureTypeAdapter<T> extends TypeAdapter<T> {
-    private TypeAdapter<T> delegate;
+    private volatile TypeAdapter<T> delegate;
 
     void setDelegate(TypeAdapter<T> delegate) {
       this.delegate = delegate;
