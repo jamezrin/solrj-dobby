@@ -123,7 +123,17 @@ public record Product(
 
 ## Nested documents
 
-Mark nested fields with `nested = true`. Dobby reads from both named field values and `getChildDocuments()`, and writes them as child documents. Unlike SolrJ, you can have multiple nested fields:
+Solr supports indexing child documents inside a parent - useful for things like product variants, order line items, or any one-to-many relationship you want to query with block join.
+
+### `@SolrField(nested = true)`
+
+Mark a field with `nested = true` to tell Dobby it holds nested child documents rather than a plain scalar value.
+
+**On read**, Dobby uses two strategies, in order:
+1. Named field value - if the Solr response contains a field with the given name whose value is a `SolrDocument` or `List<SolrDocument>` (returned by modern Solr with `[child]` or `fl=*,[child]`), that value is used.
+2. `getChildDocuments()` - if the named field has no value, Dobby falls back to the document's child document list (classic block-join retrieval).
+
+**On write**, Dobby calls `addChildDocument()` on the parent `SolrInputDocument` for each nested object. The nested type is converted recursively using its own adapter.
 
 ```java
 public class Order {
@@ -131,10 +141,31 @@ public class Order {
     public String id;
 
     @SolrField(value = "items", nested = true)
-    public List<LineItem> items;
+    public List<LineItem> items;          // list of nested docs
 
     @SolrField(value = "shipping", nested = true)
-    public ShippingInfo shipping; // single nested object works too
+    public ShippingInfo shipping;         // single nested doc also works
+}
+```
+
+Unlike SolrJ's `@Field(child = true)`, **multiple fields can be marked `nested = true`** on the same class - for example, a product with both variants and reviews as separate child document collections.
+
+Arrays work too (`LineItem[] items`). When there are no child documents and the named field is absent, the field is set to `null`.
+
+### `@Field(child = true)` (SolrJ compatibility)
+
+The SolrJ `@Field(child = true)` annotation works identically through Dobby's compatibility layer. The same two-strategy read (named field value first, then `getChildDocuments()`) and write (via `addChildDocument()`) logic applies. Migrate to `@SolrField(nested = true)` at your own pace.
+
+```java
+public class LegacyBean {
+    @Field // SolrJ annotation - still works
+    public String id;
+
+    @Field("product_name")
+    public String name;
+
+    @Field(child = true)
+    public List<LegacyChild> children;
 }
 ```
 
