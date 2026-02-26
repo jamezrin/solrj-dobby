@@ -566,6 +566,66 @@ class ReflectiveAdapterTest {
   }
 
   @Nested
+  class MultipleNestedFieldsTests {
+
+    // Dobby allows multiple nested=true fields per class; SolrJ's @Field(child=true) does not.
+
+    @Test
+    void readsTwoNestedFieldsFromFieldValues() {
+      SolrDocument variantDoc = new SolrDocument();
+      variantDoc.setField("sku", "MN1");
+      variantDoc.setField("color", "blue");
+
+      SolrDocument reviewDoc = new SolrDocument();
+      reviewDoc.setField("author", "Alice");
+      reviewDoc.setField("body", "Great product");
+
+      SolrDocument parent = new SolrDocument();
+      parent.setField("id", "mn1");
+      parent.setField("variants", List.of(variantDoc));
+      parent.setField("reviews", List.of(reviewDoc));
+
+      ProductWithMultipleNested p = dobby.fromDoc(parent, ProductWithMultipleNested.class);
+      assertEquals("mn1", p.id);
+      assertNotNull(p.variants);
+      assertEquals(1, p.variants.size());
+      assertEquals("MN1", p.variants.get(0).sku);
+      assertNotNull(p.reviews);
+      assertEquals(1, p.reviews.size());
+      assertEquals("Alice", p.reviews.get(0).author);
+    }
+
+    @Test
+    void writesTwoNestedFieldsAsChildDocuments() {
+      Variant v = new Variant();
+      v.sku = "MN2";
+      v.color = "green";
+
+      Review r = new Review();
+      r.author = "Bob";
+      r.body = "Nice";
+
+      ProductWithMultipleNested p = new ProductWithMultipleNested();
+      p.id = "mn2";
+      p.variants = List.of(v);
+      p.reviews = List.of(r);
+
+      SolrInputDocument doc = dobby.toDoc(p);
+      assertEquals("mn2", doc.getFieldValue("id"));
+      assertNotNull(doc.getChildDocuments());
+      // Both nested lists are written as child documents
+      assertEquals(2, doc.getChildDocuments().size());
+
+      List<SolrInputDocument> children = doc.getChildDocuments();
+      boolean foundVariant = children.stream().anyMatch(c -> "MN2".equals(c.getFieldValue("sku")));
+      boolean foundReview =
+          children.stream().anyMatch(c -> "Bob".equals(c.getFieldValue("author")));
+      assertTrue(foundVariant, "Expected a child doc with sku=MN2");
+      assertTrue(foundReview, "Expected a child doc with author=Bob");
+    }
+  }
+
+  @Nested
   class MixedListTypeTests {
 
     @Test
@@ -837,6 +897,25 @@ class ReflectiveAdapterTest {
 
     @SolrField("cat")
     public String[] categories;
+  }
+
+  public static class Review {
+    @SolrField("author")
+    public String author;
+
+    @SolrField("body")
+    public String body;
+  }
+
+  public static class ProductWithMultipleNested {
+    @SolrField("id")
+    public String id;
+
+    @SolrField(value = "variants", nested = true)
+    public List<Variant> variants;
+
+    @SolrField(value = "reviews", nested = true)
+    public List<Review> reviews;
   }
 
   public static class MixedListBean {

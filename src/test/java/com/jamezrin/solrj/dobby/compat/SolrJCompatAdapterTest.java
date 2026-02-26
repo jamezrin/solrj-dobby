@@ -100,6 +100,26 @@ class SolrJCompatAdapterTest {
     }
 
     @Test
+    void readsChildDocumentsViaFieldValue() {
+      // Strategy 1: modern Solr can return nested docs as a named field value
+      SolrDocument child = new SolrDocument();
+      child.setField("id", "child2");
+      child.setField("title", "Child via field value");
+
+      SolrDocument parent = new SolrDocument();
+      parent.setField("id", "parent2");
+      parent.setField("title", "Parent");
+      // child=true field name is "children" by default (java field name)
+      parent.setField("children", List.of(child));
+
+      SolrJParentBean bean = dobby.fromDoc(parent, SolrJParentBean.class);
+      assertEquals("parent2", bean.id);
+      assertNotNull(bean.children);
+      assertEquals(1, bean.children.size());
+      assertEquals("child2", bean.children.get(0).id);
+    }
+
+    @Test
     void writesChildDocumentsViaSolrJAnnotation() {
       SolrJBean child = new SolrJBean();
       child.id = "ch1";
