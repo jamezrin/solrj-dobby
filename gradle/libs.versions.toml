@@ -4,7 +4,7 @@ junit = "5.12.2"
 spotless = "7.0.4"
 maven-publish = "0.36.0"
 google-java-format = "1.27.0"
-testcontainers = "2.0.2"
+testcontainers = "2.0.3"
 
 [libraries]
 solrj = { module = "org.apache.solr:solr-solrj", version.ref = "solrj" }
