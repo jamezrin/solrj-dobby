@@ -11,6 +11,7 @@ on:
           - patch
           - minor
           - major
+          - none
 
 permissions:
   contents: write
@@ -31,6 +32,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Build and unit tests
+        run: ./gradlew build
+
+      - name: Integration tests
+        run: ./gradlew integrationTest
+
       - name: Compute new version
         id: version
         run: |
@@ -43,6 +50,7 @@ jobs:
             major) major=$((major + 1)); minor=0; patch=0 ;;
             minor) minor=$((minor + 1)); patch=0 ;;
             patch) patch=$((patch + 1)) ;;
+            none)  ;;
           esac
 
           new="$major.$minor.$patch"
@@ -50,24 +58,32 @@ jobs:
           echo "new=$new" >> "$GITHUB_OUTPUT"
 
       - name: Update version in build.gradle.kts
+        if: inputs.bump != 'none'
         run: |
           sed -i 's/version = "${{ steps.version.outputs.current }}"/version = "${{ steps.version.outputs.new }}"/' build.gradle.kts
 
       - name: Update version in README.md
+        if: inputs.bump != 'none'
         run: |
           sed -i 's|<version>${{ steps.version.outputs.current }}</version>|<version>${{ steps.version.outputs.new }}</version>|' README.md
 
       - name: Apply spotless formatting
+        if: inputs.bump != 'none'
         run: ./gradlew spotlessApply
 
       - name: Commit and tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add build.gradle.kts README.md
-          git commit -m "chore(release): bump version to v${{ steps.version.outputs.new }}"
+          if [ "${{ inputs.bump }}" != "none" ]; then
+            git add build.gradle.kts README.md
+            git commit -m "chore(release): bump version to v${{ steps.version.outputs.new }}"
+          fi
           git tag "v${{ steps.version.outputs.new }}"
           git push origin main --tags
+
+      - name: Build release JAR
+        run: ./gradlew assemble
 
       - name: Create draft release
         env:
@@ -76,4 +92,5 @@ jobs:
           gh release create "v${{ steps.version.outputs.new }}" \
             --draft \
             --generate-notes \
-            --title "v${{ steps.version.outputs.new }}"
+            --title "v${{ steps.version.outputs.new }}" \
+            build/libs/solrj-dobby-${{ steps.version.outputs.new }}.jar

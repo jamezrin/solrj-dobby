@@ -28,11 +28,8 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Build and unit tests
+      - name: Build
         run: ./gradlew build
-
-      - name: Integration tests
-        run: ./gradlew integrationTest
 
       - name: Decode GPG key into env
         run: |
