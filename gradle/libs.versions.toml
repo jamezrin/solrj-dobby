@@ -1,7 +1,7 @@
 [versions]
 solrj = "9.10.1"
 junit = "5.14.3"
-spotless = "7.0.4"
+spotless = "7.2.1"
 maven-publish = "0.36.0"
 google-java-format = "1.27.0"
 testcontainers = "2.0.3"
