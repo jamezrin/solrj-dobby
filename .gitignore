@@ -19,3 +19,6 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# Local secrets (GPG keys, credentials)
+secrets/
