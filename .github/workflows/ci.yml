@@ -36,7 +36,7 @@ jobs:
 
       - name: Upload test results
         if: always() && !env.ACT
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-jdk-${{ matrix.java-version }}
           path: build/reports/tests/test/
@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload integration test results
         if: always() && !env.ACT
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: integration-test-results-jdk-${{ matrix.java-version }}
           path: build/reports/tests/integrationTest/
@@ -52,7 +52,7 @@ jobs:
 
       - name: Upload coverage report
         if: always() && matrix.java-version == '21' && !env.ACT
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: build/reports/jacoco/test/
