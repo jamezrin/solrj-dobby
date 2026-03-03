@@ -31,18 +31,10 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: Decode GPG key into env
-        run: |
-          decoded=$(echo "$GPG_PRIVATE_KEY_B64" | base64 -d)
-          echo "ORG_GRADLE_PROJECT_signingInMemoryKey<<EOF_GPG" >> "$GITHUB_ENV"
-          echo "$decoded" >> "$GITHUB_ENV"
-          echo "EOF_GPG" >> "$GITHUB_ENV"
-        env:
-          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY }}
-
       - name: Publish to Maven Central
         run: ./gradlew publishToMavenCentral --no-daemon
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}

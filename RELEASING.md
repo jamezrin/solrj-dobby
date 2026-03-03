@@ -10,7 +10,7 @@ Configure these in the repository settings under **Settings → Secrets and vari
 |--------|--------------|
 | `MAVEN_CENTRAL_USERNAME` | Portal token username from [central.sonatype.com](https://central.sonatype.com) |
 | `MAVEN_CENTRAL_PASSWORD` | Portal token password from [central.sonatype.com](https://central.sonatype.com) |
-| `GPG_PRIVATE_KEY` | `gpg --export-secret-keys --armor KEY_ID \| base64 -w0` |
+| `GPG_PRIVATE_KEY` | `gpg --export-secret-keys --armor KEY_ID` (paste the full armored output, including the `-----BEGIN/END-----` lines) |
 | `GPG_PASSWORD` | Your GPG key passphrase |
 
 The GPG key must be uploaded to a public keyserver before publishing:
