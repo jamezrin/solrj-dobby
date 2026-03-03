@@ -3,7 +3,13 @@ package com.jamezrin.solrj.dobby;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -223,6 +229,113 @@ class DobbyTest {
     // Buffer position should be unchanged, so a second read produces the same result
     byte[] second = adapter.read(buffer);
     assertArrayEquals(data, second);
+  }
+
+  @Test
+  void concurrentGetAdapterForSameType() throws Exception {
+    Dobby dobby = Dobby.builder().build();
+    int threadCount = 16;
+    CyclicBarrier barrier = new CyclicBarrier(threadCount);
+    ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+
+    List<Future<TypeAdapter<SimpleBean>>> futures = new ArrayList<>();
+    for (int i = 0; i < threadCount; i++) {
+      futures.add(
+          executor.submit(
+              () -> {
+                barrier.await(5, TimeUnit.SECONDS);
+                return dobby.getAdapter(SimpleBean.class);
+              }));
+    }
+
+    executor.shutdown();
+    assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS));
+
+    // All threads must get a fully resolved adapter (not a FutureTypeAdapter with null delegate)
+    TypeAdapter<SimpleBean> first = futures.get(0).get();
+    assertNotNull(first);
+    for (Future<TypeAdapter<SimpleBean>> f : futures) {
+      assertNotNull(f.get());
+    }
+
+    // Verify the adapter actually works (delegate was set)
+    SolrDocument doc = new SolrDocument();
+    doc.setField("id", "concurrent");
+    doc.setField("name", "test");
+    SimpleBean bean = first.read(doc);
+    assertEquals("concurrent", bean.id);
+  }
+
+  @Test
+  void concurrentGetAdapterForSelfReferencingType() throws Exception {
+    Dobby dobby = Dobby.builder().build();
+    int threadCount = 16;
+    CyclicBarrier barrier = new CyclicBarrier(threadCount);
+    ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+
+    List<Future<TypeAdapter<TreeNode>>> futures = new ArrayList<>();
+    for (int i = 0; i < threadCount; i++) {
+      futures.add(
+          executor.submit(
+              () -> {
+                barrier.await(5, TimeUnit.SECONDS);
+                return dobby.getAdapter(TreeNode.class);
+              }));
+    }
+
+    executor.shutdown();
+    assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS));
+
+    for (Future<TypeAdapter<TreeNode>> f : futures) {
+      TypeAdapter<TreeNode> adapter = f.get();
+      assertNotNull(adapter);
+
+      // Verify each adapter works correctly with nested self-reference
+      SolrDocument childDoc = new SolrDocument();
+      childDoc.setField("name", "child");
+
+      SolrDocument parentDoc = new SolrDocument();
+      parentDoc.setField("name", "parent");
+      parentDoc.addChildDocument(childDoc);
+
+      TreeNode parent = adapter.read(parentDoc);
+      assertEquals("parent", parent.name);
+      assertNotNull(parent.child);
+      assertEquals("child", parent.child.name);
+    }
+  }
+
+  @Test
+  void concurrentGetAdapterForDifferentTypes() throws Exception {
+    Dobby dobby = Dobby.builder().build();
+    CyclicBarrier barrier = new CyclicBarrier(3);
+    ExecutorService executor = Executors.newFixedThreadPool(3);
+
+    Future<TypeAdapter<SimpleBean>> f1 =
+        executor.submit(
+            () -> {
+              barrier.await(5, TimeUnit.SECONDS);
+              return dobby.getAdapter(SimpleBean.class);
+            });
+    Future<TypeAdapter<TreeNode>> f2 =
+        executor.submit(
+            () -> {
+              barrier.await(5, TimeUnit.SECONDS);
+              return dobby.getAdapter(TreeNode.class);
+            });
+    Future<TypeAdapter<NamingBean>> f3 =
+        executor.submit(
+            () -> {
+              barrier.await(5, TimeUnit.SECONDS);
+              return dobby.getAdapter(NamingBean.class);
+            });
+
+    executor.shutdown();
+    assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS));
+
+    assertNotNull(f1.get());
+    assertNotNull(f2.get());
+    assertNotNull(f3.get());
   }
 
   public static class SimpleBean {

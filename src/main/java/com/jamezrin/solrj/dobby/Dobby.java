@@ -3,6 +3,7 @@ package com.jamezrin.solrj.dobby;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,15 @@ public final class Dobby {
   private final List<TypeAdapterFactory> factories;
   private final FieldNamingStrategy fieldNamingStrategy;
   private final Map<TypeToken<?>, TypeAdapter<?>> adapterCache = new ConcurrentHashMap<>();
+
+  /**
+   * Per-thread map of type tokens currently being resolved. This allows the same thread to re-enter
+   * {@link #getAdapter} for recursive/self-referencing types (returning the {@link
+   * FutureTypeAdapter} placeholder) while ensuring other threads never see an unresolved
+   * placeholder in the shared {@link #adapterCache}.
+   */
+  private final ThreadLocal<Map<TypeToken<?>, FutureTypeAdapter<?>>> threadCalls =
+      ThreadLocal.withInitial(HashMap::new);
 
   Dobby(List<TypeAdapterFactory> factories, FieldNamingStrategy fieldNamingStrategy) {
     this.factories = Collections.unmodifiableList(new ArrayList<>(factories));
@@ -164,6 +174,11 @@ public final class Dobby {
   /**
    * Returns the {@link TypeAdapter} for the given type token.
    *
+   * <p>This method is thread-safe. Concurrent callers requesting the same type will block (via
+   * cache miss) until the first caller finishes creating the adapter. Recursive/self-referencing
+   * types are handled by returning a {@link FutureTypeAdapter} placeholder to the same thread,
+   * which is resolved before the outermost call returns.
+   *
    * @param type the type token
    * @param <T> the Java type
    * @return the adapter
@@ -177,10 +192,15 @@ public final class Dobby {
       return DobbyUtils.uncheckedCast(cached);
     }
 
-    // To handle recursive types, we use a FutureTypeAdapter that will be resolved later.
-    // This prevents infinite recursion when, e.g., a POJO has a field of its own type.
+    // Same-thread reentrance: return the placeholder for recursive/self-referencing types.
+    Map<TypeToken<?>, FutureTypeAdapter<?>> inFlight = threadCalls.get();
+    FutureTypeAdapter<?> existing = inFlight.get(type);
+    if (existing != null) {
+      return DobbyUtils.uncheckedCast(existing);
+    }
+
     FutureTypeAdapter<T> future = new FutureTypeAdapter<>();
-    adapterCache.put(type, future);
+    inFlight.put(type, future);
 
     try {
       for (TypeAdapterFactory factory : factories) {
@@ -192,12 +212,12 @@ public final class Dobby {
         }
       }
     } catch (Exception e) {
-      adapterCache.remove(type);
       if (e instanceof DobbyException de) throw de;
       throw new DobbyException("Failed to create adapter for " + type, e);
+    } finally {
+      inFlight.remove(type);
     }
 
-    adapterCache.remove(type);
     throw new DobbyException(
         "No TypeAdapter found for "
             + type
