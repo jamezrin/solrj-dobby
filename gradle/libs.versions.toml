@@ -1,6 +1,6 @@
 [versions]
 solrj = "9.10.1"
-junit = "5.12.2"
+junit = "5.14.3"
 spotless = "7.0.4"
 maven-publish = "0.36.0"
 google-java-format = "1.27.0"
