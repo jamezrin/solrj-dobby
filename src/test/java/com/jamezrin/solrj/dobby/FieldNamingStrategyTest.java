@@ -23,7 +23,7 @@ class FieldNamingStrategyTest {
   @Nested
   class LowerUnderscoreStrategyTests {
     @Test
-    void simplesCamelCase() {
+    void simpleCamelCase() {
       assertEquals("created_at", FieldNamingStrategy.LOWER_UNDERSCORE.translateName("createdAt"));
     }
 
