@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
@@ -191,10 +192,22 @@ public final class SolrJCompatAdapterFactory implements TypeAdapterFactory {
         }
         return bf.adapter.read(children.get(0));
       }
+      // For Optional child fields, null must go through the adapter so that
+      // null becomes Optional.empty() instead of remaining null.
+      if (Optional.class.isAssignableFrom(bf.type)) {
+        return bf.adapter.read(null);
+      }
       return null;
     }
     Object raw = doc.getFieldValue(bf.solrName);
-    if (raw == null) return null;
+    if (raw == null) {
+      // For Optional fields, we must still invoke the adapter so that
+      // null becomes Optional.empty() instead of remaining null.
+      if (Optional.class.isAssignableFrom(bf.type)) {
+        return bf.adapter.read(null);
+      }
+      return null;
+    }
     return bf.adapter.read(raw);
   }
 
