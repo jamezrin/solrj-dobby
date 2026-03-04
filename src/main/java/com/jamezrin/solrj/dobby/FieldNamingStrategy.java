@@ -21,37 +21,17 @@ public interface FieldNamingStrategy {
   FieldNamingStrategy IDENTITY = fieldName -> fieldName;
 
   /**
-   * Converts camelCase to lower_underscore (snake_case), correctly handling acronyms.
+   * Converts camelCase to lower_underscore (snake_case).
    *
-   * <p>An underscore is inserted before an uppercase letter when:
-   *
-   * <ul>
-   *   <li>the preceding character is lowercase (start of a new word), or
-   *   <li>the following character is lowercase and the preceding character is uppercase (transition
-   *       from an acronym to a new word, e.g. the {@code F} in {@code URLField}).
-   * </ul>
-   *
-   * <p>Examples:
-   *
-   * <ul>
-   *   <li>{@code createdAt} → {@code created_at}
-   *   <li>{@code myURLField} → {@code my_url_field}
-   *   <li>{@code HTTPSRequest} → {@code https_request}
-   *   <li>{@code URL} → {@code url}
-   * </ul>
+   * <p>Example: {@code createdAt} → {@code created_at}
    */
   FieldNamingStrategy LOWER_UNDERSCORE =
       fieldName -> {
-        if (fieldName == null || fieldName.isEmpty()) return fieldName;
         StringBuilder sb = new StringBuilder();
-        int len = fieldName.length();
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < fieldName.length(); i++) {
           char c = fieldName.charAt(i);
           if (Character.isUpperCase(c)) {
-            boolean prevLower = i > 0 && Character.isLowerCase(fieldName.charAt(i - 1));
-            boolean prevUpper = i > 0 && Character.isUpperCase(fieldName.charAt(i - 1));
-            boolean nextLower = i + 1 < len && Character.isLowerCase(fieldName.charAt(i + 1));
-            if (prevLower || (prevUpper && nextLower)) {
+            if (i > 0) {
               sb.append('_');
             }
             sb.append(Character.toLowerCase(c));

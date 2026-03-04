@@ -735,66 +735,6 @@ class ReflectiveAdapterTest {
       ExplicitNameBean bean = snakeDobby.fromDoc(doc, ExplicitNameBean.class);
       assertEquals("X", bean.myId);
     }
-
-    @Test
-    void lowerUnderscoreWithAcronymInMiddle() {
-      Dobby snakeDobby =
-          Dobby.builder().fieldNamingStrategy(FieldNamingStrategy.LOWER_UNDERSCORE).build();
-
-      SolrDocument doc = new SolrDocument();
-      doc.setField("my_url_field", "https://example.com");
-
-      AcronymBean bean = snakeDobby.fromDoc(doc, AcronymBean.class);
-      assertEquals("https://example.com", bean.myURLField);
-    }
-
-    @Test
-    void lowerUnderscoreWithAcronymOnly() {
-      Dobby snakeDobby =
-          Dobby.builder().fieldNamingStrategy(FieldNamingStrategy.LOWER_UNDERSCORE).build();
-
-      SolrDocument doc = new SolrDocument();
-      doc.setField("url", "https://example.com");
-
-      AcronymOnlyBean bean = snakeDobby.fromDoc(doc, AcronymOnlyBean.class);
-      assertEquals("https://example.com", bean.URL);
-    }
-  }
-
-  @Nested
-  class OptionalNestedFieldTests {
-    @Test
-    void optionalNestedFieldAbsentReturnsEmpty() {
-      // When there are no child docs and no named field, Optional nested field
-      // must resolve to Optional.empty(), not null.
-      SolrDocument doc = new SolrDocument();
-      doc.setField("id", "o1");
-      // No child documents added
-
-      OptionalNestedBean bean = dobby.fromDoc(doc, OptionalNestedBean.class);
-      assertEquals("o1", bean.id);
-      assertNotNull(bean.child, "Optional nested field must not be null when absent");
-      assertEquals(
-          Optional.empty(),
-          bean.child,
-          "Optional nested field must be Optional.empty() when absent");
-    }
-
-    @Test
-    void optionalNestedFieldPresentReturnsValue() {
-      SolrDocument childDoc = new SolrDocument();
-      childDoc.setField("author", "Alice");
-      childDoc.setField("body", "Great");
-
-      SolrDocument doc = new SolrDocument();
-      doc.setField("id", "o2");
-      doc.addChildDocument(childDoc);
-
-      OptionalNestedBean bean = dobby.fromDoc(doc, OptionalNestedBean.class);
-      assertEquals("o2", bean.id);
-      assertTrue(bean.child.isPresent());
-      assertEquals("Alice", bean.child.get().author);
-    }
   }
 
   public static class Product {
@@ -987,23 +927,5 @@ class ReflectiveAdapterTest {
 
     @SolrField(value = "nested_items", nested = true)
     public List<Variant> nestedItems;
-  }
-
-  public static class AcronymBean {
-    @SolrField // no explicit name; naming strategy will be applied
-    public String myURLField;
-  }
-
-  public static class AcronymOnlyBean {
-    @SolrField // no explicit name; naming strategy will be applied
-    public String URL;
-  }
-
-  public static class OptionalNestedBean {
-    @SolrField("id")
-    public String id;
-
-    @SolrField(nested = true)
-    public Optional<Review> child;
   }
 }

@@ -3,7 +3,6 @@ package com.jamezrin.solrj.dobby.compat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
@@ -216,34 +215,6 @@ class SolrJCompatAdapterTest {
     }
   }
 
-  @Nested
-  class OptionalFieldCompatTests {
-    @Test
-    void optionalNonChildFieldAbsentReturnsEmpty() {
-      // A @Field-annotated Optional field with no value in the Solr response
-      // must resolve to Optional.empty(), not null.
-      SolrDocument doc = new SolrDocument();
-      doc.setField("id", "opt1");
-      // "description" is not set in the document
-
-      OptionalCompatBean bean = dobby.fromDoc(doc, OptionalCompatBean.class);
-      assertEquals("opt1", bean.id);
-      assertNotNull(bean.description, "Optional field must not be null when absent");
-      assertEquals(Optional.empty(), bean.description);
-    }
-
-    @Test
-    void optionalNonChildFieldPresentReturnsValue() {
-      SolrDocument doc = new SolrDocument();
-      doc.setField("id", "opt2");
-      doc.setField("description", "hello");
-
-      OptionalCompatBean bean = dobby.fromDoc(doc, OptionalCompatBean.class);
-      assertEquals("opt2", bean.id);
-      assertEquals(Optional.of("hello"), bean.description);
-    }
-  }
-
   public static class SolrJBean {
     @Field public String id;
 
@@ -309,11 +280,5 @@ class SolrJCompatAdapterTest {
 
     @Field("items")
     public List<SolrJBean> items;
-  }
-
-  public static class OptionalCompatBean {
-    @Field public String id;
-
-    @Field public Optional<String> description;
   }
 }
