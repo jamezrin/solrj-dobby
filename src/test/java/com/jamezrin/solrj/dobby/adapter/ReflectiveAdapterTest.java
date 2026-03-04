@@ -735,6 +735,30 @@ class ReflectiveAdapterTest {
       ExplicitNameBean bean = snakeDobby.fromDoc(doc, ExplicitNameBean.class);
       assertEquals("X", bean.myId);
     }
+
+    @Test
+    void lowerUnderscoreWithAcronymInMiddle() {
+      Dobby snakeDobby =
+          Dobby.builder().fieldNamingStrategy(FieldNamingStrategy.LOWER_UNDERSCORE).build();
+
+      SolrDocument doc = new SolrDocument();
+      doc.setField("my_url_field", "https://example.com");
+
+      AcronymBean bean = snakeDobby.fromDoc(doc, AcronymBean.class);
+      assertEquals("https://example.com", bean.myURLField);
+    }
+
+    @Test
+    void lowerUnderscoreWithAcronymOnly() {
+      Dobby snakeDobby =
+          Dobby.builder().fieldNamingStrategy(FieldNamingStrategy.LOWER_UNDERSCORE).build();
+
+      SolrDocument doc = new SolrDocument();
+      doc.setField("url", "https://example.com");
+
+      AcronymOnlyBean bean = snakeDobby.fromDoc(doc, AcronymOnlyBean.class);
+      assertEquals("https://example.com", bean.URL);
+    }
   }
 
   public static class Product {
@@ -927,5 +951,15 @@ class ReflectiveAdapterTest {
 
     @SolrField(value = "nested_items", nested = true)
     public List<Variant> nestedItems;
+  }
+
+  public static class AcronymBean {
+    @SolrField // no explicit name; naming strategy will be applied
+    public String myURLField;
+  }
+
+  public static class AcronymOnlyBean {
+    @SolrField // no explicit name; naming strategy will be applied
+    public String URL;
   }
 }
