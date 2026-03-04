@@ -192,7 +192,13 @@ public final class ReflectiveAdapterFactory implements TypeAdapterFactory {
 
   private static Object readFieldValue(BoundField bf, SolrDocument doc) {
     if (bf.nested()) {
-      return readNestedValue(bf, doc);
+      Object nestedValue = readNestedValue(bf, doc);
+      // For Optional nested fields, null must still go through the adapter so that
+      // null becomes Optional.empty() instead of remaining null.
+      if (nestedValue == null && Optional.class.isAssignableFrom(bf.type())) {
+        return bf.adapter().read(null);
+      }
+      return nestedValue;
     }
     Object raw = doc.getFieldValue(bf.solrName());
     if (raw == null) {
