@@ -3,7 +3,7 @@ header = ""
 body = """
 ## What's Changed
 {% for commit in commits %}\
-* {{ commit.message | split(pat="\n") | first | trim }} by @{{ commit.author.name }} in https://github.com/jamezrin/solrj-dobby/commit/{{ commit.id }}
+* {{ commit.message | split(pat="\n") | first | trim }} by @{{ commit.remote.username | default(value=commit.author.name) }} in https://github.com/jamezrin/solrj-dobby/commit/{{ commit.id }}
 {% endfor %}
 **Full Changelog**: https://github.com/jamezrin/solrj-dobby/compare/{{ previous.version }}...{{ version }}
 """
@@ -26,3 +26,7 @@ skip_tags = ""
 ignore_tags = ""
 topo_order = false
 sort_commits = "oldest"
+
+[remote.github]
+owner = "jamezrin"
+repo = "solrj-dobby"
