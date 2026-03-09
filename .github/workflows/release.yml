@@ -87,10 +87,9 @@ jobs:
 
       - name: Generate changelog
         uses: orhun/git-cliff-action@v4
-        id: changelog
         with:
           config: cliff.toml
-          args: --latest
+          args: --latest --output RELEASE_NOTES.md
 
       - name: Create draft release
         env:
@@ -98,6 +97,6 @@ jobs:
         run: |
           gh release create "v${{ steps.version.outputs.new }}" \
             --draft \
-            --notes-file "${{ steps.changelog.outputs.changelog }}" \
+            --notes-file RELEASE_NOTES.md \
             --title "v${{ steps.version.outputs.new }}" \
             build/libs/solrj-dobby-${{ steps.version.outputs.new }}.jar
