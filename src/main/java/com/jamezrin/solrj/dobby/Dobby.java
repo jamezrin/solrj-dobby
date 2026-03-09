@@ -174,10 +174,11 @@ public final class Dobby {
   /**
    * Returns the {@link TypeAdapter} for the given type token.
    *
-   * <p>This method is thread-safe. Concurrent callers requesting the same type will block (via
-   * cache miss) until the first caller finishes creating the adapter. Recursive/self-referencing
-   * types are handled by returning a {@link FutureTypeAdapter} placeholder to the same thread,
-   * which is resolved before the outermost call returns.
+   * <p>This method is thread-safe. Multiple concurrent callers requesting the same type may each
+   * independently create the adapter; the result is idempotent and all callers will receive a fully
+   * resolved adapter. Recursive/self-referencing types are handled within a single thread by
+   * returning a {@link FutureTypeAdapter} placeholder to the same thread, which is resolved before
+   * the outermost call returns.
    *
    * @param type the type token
    * @param <T> the Java type
