@@ -90,7 +90,7 @@ jobs:
         id: changelog
         with:
           config: cliff.toml
-          args: --latest --strip header
+          args: --latest
 
       - name: Create draft release
         env:
