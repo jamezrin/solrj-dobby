@@ -7,7 +7,7 @@ body = """
 {% endfor %}
 **Full Changelog**: https://github.com/jamezrin/solrj-dobby/compare/{{ previous.version }}...{{ version }}
 """
-trim = true
+trim = false
 
 [git]
 conventional_commits = false
