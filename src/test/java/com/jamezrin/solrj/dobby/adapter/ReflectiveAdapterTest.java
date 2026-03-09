@@ -761,6 +761,42 @@ class ReflectiveAdapterTest {
     }
   }
 
+  @Nested
+  class OptionalNestedFieldTests {
+    @Test
+    void optionalNestedFieldAbsentReturnsEmpty() {
+      // When there are no child docs and no named field, Optional nested field
+      // must resolve to Optional.empty(), not null.
+      SolrDocument doc = new SolrDocument();
+      doc.setField("id", "o1");
+      // No child documents added
+
+      OptionalNestedBean bean = dobby.fromDoc(doc, OptionalNestedBean.class);
+      assertEquals("o1", bean.id);
+      assertNotNull(bean.child, "Optional nested field must not be null when absent");
+      assertEquals(
+          Optional.empty(),
+          bean.child,
+          "Optional nested field must be Optional.empty() when absent");
+    }
+
+    @Test
+    void optionalNestedFieldPresentReturnsValue() {
+      SolrDocument childDoc = new SolrDocument();
+      childDoc.setField("author", "Alice");
+      childDoc.setField("body", "Great");
+
+      SolrDocument doc = new SolrDocument();
+      doc.setField("id", "o2");
+      doc.addChildDocument(childDoc);
+
+      OptionalNestedBean bean = dobby.fromDoc(doc, OptionalNestedBean.class);
+      assertEquals("o2", bean.id);
+      assertTrue(bean.child.isPresent());
+      assertEquals("Alice", bean.child.get().author);
+    }
+  }
+
   public static class Product {
     @SolrField("id")
     public String id;
@@ -961,5 +997,13 @@ class ReflectiveAdapterTest {
   public static class AcronymOnlyBean {
     @SolrField // no explicit name; naming strategy will be applied
     public String URL;
+  }
+
+  public static class OptionalNestedBean {
+    @SolrField("id")
+    public String id;
+
+    @SolrField(nested = true)
+    public Optional<Review> child;
   }
 }
