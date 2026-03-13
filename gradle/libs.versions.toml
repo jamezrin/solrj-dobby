@@ -1,5 +1,5 @@
 [versions]
-solrj = "9.10.1"
+solrj = "10.0.0"
 junit = "6.0.3"
 spotless = "8.3.0"
 maven-publish = "0.36.0"
