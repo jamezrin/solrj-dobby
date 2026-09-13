@@ -1,5 +1,5 @@
 [tools]
-java = "21"
+java = "25"
 gradle = "9.3.1"
 
 [env]
