@@ -159,11 +159,11 @@ subprojects {
         signAllPublications()
     }
 
-    // Existing coordinate. Same jar as solrj-dobby-solr9, so SolrJ 9 projects keep working.
+    // Existing coordinate. A POM that depends on the SolrJ 9 artifact, so the two
+    // publications do not sign the same files.
     if (projectName == "solr9") {
         configure<PublishingExtension> {
             publications.create<MavenPublication>("legacy") {
-                from(components["java"])
                 this.artifactId = "solrj-dobby"
 
                 pom {
@@ -171,6 +171,7 @@ subprojects {
                     description.set("A modern replacement for SolrJ's DocumentObjectBinder")
                     url.set("https://github.com/jamezrin/solrj-dobby")
                     inceptionYear.set("2025")
+                    packaging = "pom"
 
                     licenses {
                         license {
@@ -194,16 +195,20 @@ subprojects {
                         developerConnection.set("scm:git:ssh://github.com:jamezrin/solrj-dobby.git")
                         url.set("https://github.com/jamezrin/solrj-dobby")
                     }
+
+                    withXml {
+                        val dependency = asNode().appendNode("dependencies").appendNode("dependency")
+                        dependency.appendNode("groupId", group.toString())
+                        dependency.appendNode("artifactId", "solrj-dobby-solr9")
+                        dependency.appendNode("version", version.toString())
+
+                        val relocation = asNode().appendNode("distributionManagement").appendNode("relocation")
+                        relocation.appendNode("groupId", group.toString())
+                        relocation.appendNode("artifactId", "solrj-dobby-solr9")
+                        relocation.appendNode("version", version.toString())
+                    }
                 }
             }
-        }
-        afterEvaluate {
-            extensions.getByType(PublishingExtension::class.java)
-                .publications
-                .named<MavenPublication>("legacy")
-                .configure {
-                    artifact(tasks.named("plainJavadocJar"))
-                }
         }
     }
 }
