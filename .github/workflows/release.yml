@@ -99,4 +99,5 @@ jobs:
             --draft \
             --notes-file RELEASE_NOTES.md \
             --title "v${{ steps.version.outputs.new }}" \
-            build/libs/solrj-dobby-${{ steps.version.outputs.new }}.jar
+            solr9/build/libs/solrj-dobby-solr9-${{ steps.version.outputs.new }}.jar \
+            solr10/build/libs/solrj-dobby-solr10-${{ steps.version.outputs.new }}.jar

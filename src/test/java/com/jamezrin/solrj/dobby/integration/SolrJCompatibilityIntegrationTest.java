@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.SolrParams;
 
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ class SolrJCompatibilityIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:dobby-binder-1");
+    SolrParams query = SolrTestSupport.query("id:dobby-binder-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -76,7 +76,7 @@ class SolrJCompatibilityIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("product_id:naming-1");
+    SolrParams query = SolrTestSupport.query("product_id:naming-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -97,7 +97,7 @@ class SolrJCompatibilityIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:types-1");
+    SolrParams query = SolrTestSupport.query("id:types-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -128,8 +128,7 @@ class SolrJCompatibilityIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), docs);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:multi-*");
-    query.setRows(10);
+    SolrParams query = SolrTestSupport.query("id:multi-*", 10);
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 

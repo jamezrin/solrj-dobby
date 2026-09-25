@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.SchemaResponse;
@@ -57,7 +56,7 @@ import com.jamezrin.solrj.dobby.Dobby;
 @Testcontainers
 public abstract class AbstractSolrIntegrationTest {
 
-  private static final String SOLR_IMAGE = "solr:9";
+  private static final String SOLR_IMAGE = System.getProperty("solr.image", "solr:9");
   private static final String COLLECTION_NAME = "test_collection";
 
   @Container
@@ -73,7 +72,7 @@ public abstract class AbstractSolrIntegrationTest {
   static void setUpClass() throws Exception {
     String solrUrl =
         "http://" + solrContainer.getHost() + ":" + solrContainer.getMappedPort(8983) + "/solr";
-    solrClient = new Http2SolrClient.Builder(solrUrl).build();
+    solrClient = SolrTestSupport.newClient(solrUrl);
     dobby = Dobby.builder().build();
 
     // Configure schema with single-valued fields for basic types

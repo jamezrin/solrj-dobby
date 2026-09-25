@@ -1,5 +1,6 @@
 [versions]
-solrj = "9.10.1"
+solrj9 = "9.10.1"
+solrj10 = "10.0.0"
 junit = "6.1.3"
 spotless = "8.3.0"
 maven-publish = "0.37.0"
@@ -7,7 +8,8 @@ google-java-format = "1.27.0"
 testcontainers = "2.0.5"
 
 [libraries]
-solrj = { module = "org.apache.solr:solr-solrj", version.ref = "solrj" }
+solrj9 = { module = "org.apache.solr:solr-solrj", version.ref = "solrj9" }
+solrj10 = { module = "org.apache.solr:solr-solrj", version.ref = "solrj10" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 # Versions managed by junit-bom
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }

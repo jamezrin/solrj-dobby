@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -39,7 +38,8 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    QueryResponse response = getSolrClient().query(getCollectionName(), new SolrQuery("id:prim-1"));
+    QueryResponse response =
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:prim-1"));
     PrimitiveRecord retrieved =
         getDobby().fromDoc(response.getResults().get(0), PrimitiveRecord.class);
 
@@ -68,7 +68,8 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    QueryResponse response = getSolrClient().query(getCollectionName(), new SolrQuery("id:time-1"));
+    QueryResponse response =
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:time-1"));
     JavaTimeRecord retrieved =
         getDobby().fromDoc(response.getResults().get(0), JavaTimeRecord.class);
 
@@ -88,7 +89,8 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    QueryResponse response = getSolrClient().query(getCollectionName(), new SolrQuery("id:enum-1"));
+    QueryResponse response =
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:enum-1"));
     EnumRecord retrieved = getDobby().fromDoc(response.getResults().get(0), EnumRecord.class);
 
     assertEquals(record.status(), retrieved.status());
@@ -109,7 +111,8 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    QueryResponse response = getSolrClient().query(getCollectionName(), new SolrQuery("id:coll-1"));
+    QueryResponse response =
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:coll-1"));
     CollectionRecord retrieved =
         getDobby().fromDoc(response.getResults().get(0), CollectionRecord.class);
 
@@ -132,7 +135,8 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), getDobby().toDoc(empty));
     getSolrClient().commit(getCollectionName());
 
-    QueryResponse response = getSolrClient().query(getCollectionName(), new SolrQuery("id:opt-1"));
+    QueryResponse response =
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:opt-1"));
     OptionalRecord retrieved =
         getDobby().fromDoc(response.getResults().get(0), OptionalRecord.class);
 
@@ -170,7 +174,7 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().commit(getCollectionName());
 
     QueryResponse response =
-        getSolrClient().query(getCollectionName(), new SolrQuery("id:money-1"));
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:money-1"));
     MoneyRecord retrieved = customDobby.fromDoc(response.getResults().get(0), MoneyRecord.class);
 
     assertEquals(record.money().amount(), retrieved.money().amount(), 0.001);
@@ -191,7 +195,8 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().commit(getCollectionName());
 
     // Bulk read
-    QueryResponse response = getSolrClient().query(getCollectionName(), new SolrQuery("id:bulk-*"));
+    QueryResponse response =
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:bulk-*"));
     SolrDocumentList results = response.getResults();
 
     assertEquals(3, results.getNumFound());
@@ -211,7 +216,7 @@ class DobbyTypeAdaptersIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().commit(getCollectionName());
 
     QueryResponse response =
-        getSolrClient().query(getCollectionName(), new SolrQuery("id:solrj-1"));
+        getSolrClient().query(getCollectionName(), SolrTestSupport.query("id:solrj-1"));
     SolrDocument solrDoc = response.getResults().get(0);
 
     assertEquals("Field Value", solrDoc.getFieldValue("field_name"));

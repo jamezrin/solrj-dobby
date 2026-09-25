@@ -18,15 +18,32 @@
 
 ## Installation
 
-Add the dependency to your `pom.xml`:
+Pick the artifact that matches the SolrJ version on your classpath. Both artifacts ship the same library version. `solrj-dobby` is the SolrJ 9 build under the original coordinate.
 
 ```xml
+<!-- SolrJ 9 -->
 <dependency>
     <groupId>com.jamezrin</groupId>
     <artifactId>solrj-dobby</artifactId>
     <version>1.0.3</version>
 </dependency>
+
+<!-- SolrJ 9, explicit coordinate -->
+<dependency>
+    <groupId>com.jamezrin</groupId>
+    <artifactId>solrj-dobby-solr9</artifactId>
+    <version>1.0.3</version>
+</dependency>
+
+<!-- SolrJ 10 -->
+<dependency>
+    <groupId>com.jamezrin</groupId>
+    <artifactId>solrj-dobby-solr10</artifactId>
+    <version>1.0.3</version>
+</dependency>
 ```
+
+Use one of them. SolrJ 9 and SolrJ 10 cannot share a classpath.
 
 For Gradle, Kotlin DSL, and other build tools, see the snippets on [Maven Central](https://central.sonatype.com/artifact/com.jamezrin/solrj-dobby).
 

@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: test-results-jdk-${{ matrix.java-version }}
-          path: build/reports/tests/test/
+          path: "**/build/reports/tests/test/"
           retention-days: 14
 
       - name: Upload integration test results
@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: integration-test-results-jdk-${{ matrix.java-version }}
-          path: build/reports/tests/integrationTest/
+          path: "**/build/reports/tests/integrationTest/"
           retention-days: 14
 
       - name: Upload coverage report
@@ -55,14 +55,16 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: coverage-report
-          path: build/reports/jacoco/test/
+          path: "**/build/reports/jacoco/test/"
           retention-days: 14
 
       - name: Add coverage to PR
         if: github.event_name == 'pull_request' && matrix.java-version == '21'
         uses: madrapps/jacoco-report@v1.8.0
         with:
-          paths: build/reports/jacoco/test/jacocoTestReport.xml
+          paths: |
+            solr9/build/reports/jacoco/test/jacocoTestReport.xml
+            solr10/build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 60
           min-coverage-changed-files: 80

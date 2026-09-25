@@ -6,11 +6,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.SolrParams;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:prod-1");
+    SolrParams query = SolrTestSupport.query("id:prod-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -56,8 +56,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), docs);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("*:*");
-    query.setRows(10);
+    SolrParams query = SolrTestSupport.query("*:*", 10);
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -90,7 +89,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:complex-1");
+    SolrParams query = SolrTestSupport.query("id:complex-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -119,7 +118,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), updatedDoc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:update-1");
+    SolrParams query = SolrTestSupport.query("id:update-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -141,7 +140,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().deleteById(getCollectionName(), "delete-1");
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:delete-1");
+    SolrParams query = SolrTestSupport.query("id:delete-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -160,7 +159,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), docs);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("name:Alpha*");
+    SolrParams query = SolrTestSupport.query("name:Alpha*");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -181,7 +180,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     getSolrClient().add(getCollectionName(), doc);
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:opt-1");
+    SolrParams query = SolrTestSupport.query("id:opt-1");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -191,7 +190,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
 
   @Test
   void emptyResultReturnsEmptyList() throws Exception {
-    SolrQuery query = new SolrQuery("id:nonexistent");
+    SolrParams query = SolrTestSupport.query("id:nonexistent");
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
@@ -212,8 +211,7 @@ class DocumentCrudIntegrationTest extends AbstractSolrIntegrationTest {
     }
     getSolrClient().commit(getCollectionName());
 
-    SolrQuery query = new SolrQuery("id:concurrent-*");
-    query.setRows(count);
+    SolrParams query = SolrTestSupport.query("id:concurrent-*", count);
     QueryResponse response = getSolrClient().query(getCollectionName(), query);
     SolrDocumentList results = response.getResults();
 
