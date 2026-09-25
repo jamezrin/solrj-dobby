@@ -25,21 +25,21 @@ Pick the artifact that matches the SolrJ version on your classpath. Both artifac
 <dependency>
     <groupId>com.jamezrin</groupId>
     <artifactId>solrj-dobby</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
 </dependency>
 
 <!-- SolrJ 9, explicit coordinate -->
 <dependency>
     <groupId>com.jamezrin</groupId>
     <artifactId>solrj-dobby-solr9</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
 </dependency>
 
 <!-- SolrJ 10 -->
 <dependency>
     <groupId>com.jamezrin</groupId>
     <artifactId>solrj-dobby-solr10</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
