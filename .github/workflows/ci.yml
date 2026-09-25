@@ -60,7 +60,7 @@ jobs:
 
       - name: Add coverage to PR
         if: github.event_name == 'pull_request' && matrix.java-version == '21'
-        uses: madrapps/jacoco-report@v1.7.2
+        uses: madrapps/jacoco-report@v1.8.0
         with:
           paths: build/reports/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
