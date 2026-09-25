@@ -1,5 +1,5 @@
 [versions]
-solrj9 = "9.10.1"
+solrj9 = "10.0.0"
 solrj10 = "10.0.0"
 junit = "6.1.3"
 spotless = "8.3.0"
