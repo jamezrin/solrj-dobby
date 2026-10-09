@@ -1,6 +1,6 @@
 [tools]
 java = "25"
-gradle = "9.8.0"
+gradle = "9.8.1"
 
 [env]
 _.file = ".env"
